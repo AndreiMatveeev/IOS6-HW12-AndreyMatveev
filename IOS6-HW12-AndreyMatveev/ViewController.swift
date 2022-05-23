@@ -18,6 +18,12 @@ class ViewController: UIViewController {
         return button
     }()
     
+    var timer = Timer()
+        var isTimeStarted = false
+        var isWorkTime = true
+        var isAnimationStarted = false
+        var time = 5
+    
     // MARK: - Add stack
     
     private lazy var timeAndButtonStackView: UIStackView = {
@@ -59,8 +65,54 @@ class ViewController: UIViewController {
     // MARK: - Action
     
     @objc private func playPaseButtonAction() {
-        
+        if !isTimeStarted{
+                    startTimer()
+                    isTimeStarted = true
+                    playPaseButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+                } else {
+                    timer.invalidate()
+                    isTimeStarted = false
+                    playPaseButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+                }
+
     }
+    
+    func startTimer() {
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: (#selector(updateTimer)), userInfo: nil, repeats: true)
+        }
+        
+        @objc func updateTimer() {
+            if time < 1 && isWorkTime {
+                playPaseButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+                timer.invalidate()
+                time = 5
+                isWorkTime = false
+                isTimeStarted = false
+                timeLabel.text = "05:00"
+                timeLabel.textColor = UIColor.systemGreen
+                playPaseButton.tintColor = UIColor.systemGreen
+            }else if time < 1 && !isWorkTime {
+                playPaseButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+                timer.invalidate()
+                time = 5
+                isWorkTime = true
+                isTimeStarted = false
+                timeLabel.text = "25:00"
+                timeLabel.textColor = UIColor.systemRed
+                playPaseButton.tintColor = UIColor.systemRed
+            } else {
+                time -= 1
+                timeLabel.text = formatTime()
+            }
+        }
+        
+        func formatTime() -> String {
+            let minutes = Int(time) / 60 % 60
+            let second = Int(time) % 60
+            
+            return String(format: "%02i:%02i", minutes, second)
+        }
+
 
 }
 
